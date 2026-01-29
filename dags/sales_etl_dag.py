@@ -25,10 +25,19 @@ with DAG(
         task_id="clean_and_validate_data",
         bash_command="python /opt/airflow/scripts/clean.py",
     )
+    # quality_check_task addition
+    quality_task = BashOperator(
+        task_id="data_quality_check",
+        bash_command="python /opt/airflow/scripts/quality_check.py",
+    )
 
     load_task = BashOperator(
         task_id="load_fact_sales",
         bash_command="python /opt/airflow/scripts/load.py",
     )
 
-    extract_task >> clean_task >> load_task
+    extract_task >> clean_task >> quality_task >> load_task
+
+
+
+
