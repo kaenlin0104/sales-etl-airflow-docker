@@ -86,37 +86,37 @@ Pipeline được thiết kế theo kiến trúc Raw → Clean → Serve, giúp 
 
 Các quy tắc sau được áp dụng tại clean layer:
 
-Quy tắc	Mục đích
-Quantity > 0	Kiểm tra logic dữ liệu
-Unit price > 0	Kiểm tra logic dữ liệu
-Total = Quantity × Unit price	Đảm bảo tính nhất quán
-Loại bỏ Invoice ID trùng lặp	Tránh double counting
-Parse cột Date	Phục vụ phân tích theo thời gian
+| Quy tắc                       | Mục đích                         |
+| ----------------------------- | -------------------------------- |
+| Quantity > 0                  | Kiểm tra logic dữ liệu           |
+| Unit price > 0                | Kiểm tra logic dữ liệu           |
+| Total = Quantity × Unit price | Đảm bảo tính nhất quán           |
+| Loại bỏ Invoice ID trùng lặp  | Tránh double counting            |
+| Parse cột Date                | Phục vụ phân tích theo thời gian |
 
 ## 6. Logging & Data Quality Monitoring
 
-Pipeline có cơ chế logging và kiểm tra chất lượng dữ liệu như sau:
+***Pipeline có cơ chế logging và kiểm tra chất lượng dữ liệu như sau:***
 
-Logging
+- **Logging**
 
-Mỗi task trong pipeline (Extract, Clean, Load, Data Quality Check) đều ghi log
+- **Mỗi task trong pipeline (Extract, Clean, Load, Data Quality Check) đều ghi log**
 
-Log được lưu trực tiếp trong Airflow Task Logs
+- **Log được lưu trực tiếp trong Airflow Task Logs**
 
-Thông tin log bao gồm:
+***Thông tin log bao gồm:***
 
-Số lượng bản ghi xử lý
+- **Số lượng bản ghi xử lý**
 
-Trạng thái thực thi
+- **Trạng thái thực thi**
 
-Kết quả kiểm tra data
+- **Kết quả kiểm tra data**
 
-Data Quality Check
+- **Data Quality Check**
 
-Một task riêng biệt dùng để so sánh số lượng bản ghi giữa:
+***Một task riêng biệt dùng để so sánh số lượng bản ghi giữa:***
 
 Raw layer
-
 Clean layer
 
 Pipeline sẽ fail tự động nếu số lượng bản ghi bị giảm vượt ngưỡng cho phép
@@ -140,6 +140,7 @@ Pandas – Xử lý dữ liệu
 SQLAlchemy – Kết nối và thao tác với database
 
 8. Cấu trúc project
+
 sales_etl_project/
 ├── dags/
 │   └── sales_etl_dag.py        # Airflow DAG
@@ -158,11 +159,11 @@ sales_etl_project/
 
 ## 9. Airflow DAG
 
-Tên DAG: sales_etl_pipeline
+- ***Tên DAG:*** sales_etl_pipeline
 
-Schedule: Trigger thủ công
+- ***Schedule:*** Trigger thủ công
 
-Các task chính:
+***Các task chính:***
 
 Extract dữ liệu từ CSV vào raw layer
 
@@ -176,6 +177,7 @@ Pipeline được trigger và theo dõi thông qua Airflow Web UI.
 
 ## 10. Hướng dẫn chạy dự án
 1️⃣ Khởi động hệ thống bằng Docker
+```bash
 docker compose up -d
 
 2️⃣ Mở Airflow Web UI
