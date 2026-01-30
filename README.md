@@ -1,171 +1,224 @@
 # 📊 Automated Sales Data Pipeline using Airflow and Docker
 
-## 1. Project Overview
+## 1. Tổng quan dự án
 
-This project demonstrates an **end-to-end ETL pipeline** for sales transaction data using **Apache Airflow**, **PostgreSQL**, and **Docker**.
+Dự án này xây dựng một pipeline ETL end-to-end cho dữ liệu giao dịch bán hàng, sử dụng Apache Airflow, PostgreSQL và Docker.
 
-The goal is to ingest raw sales data from a CSV file, clean and validate the data, and load it into a data warehouse table ready for analytical queries.
+Mục tiêu của dự án là ingest dữ liệu bán hàng thô từ file CSV, thực hiện làm sạch và kiểm tra chất lượng dữ liệu, sau đó lưu trữ dữ liệu vào bảng Data Warehouse sẵn sàng cho việc truy vấn và phân tích.
 
-This project is designed as a **Data Engineering final project**, focusing on:
-- Data pipeline orchestration
-- Data quality validation
-- Reproducibility using Docker
+Dự án được thực hiện như một Final Project môn Data Engineering, tập trung vào:
 
----
+Orchestration pipeline bằng Airflow
 
-## 2. Problem Statement
+Kiểm soát chất lượng dữ liệu (Data Quality)
 
-Retail companies often store sales transactions in CSV or Excel files exported manually from POS systems.
+Logging và monitoring
 
-These raw datasets usually:
-- Are not schema-standardized
-- May contain duplicated transactions
-- Lack data quality validation
-- Are not directly usable for analytics
+Khả năng tái tạo hệ thống bằng Docker
 
-Therefore, an automated ETL pipeline is required to:
-- Ingest raw data
-- Clean and validate data
-- Store data in a structured format for analysis
+## 2. Vấn đề đặt ra (Problem Statement)
 
----
+Trong thực tế, dữ liệu giao dịch bán hàng của doanh nghiệp bán lẻ thường được export thủ công từ hệ thống POS dưới dạng file CSV hoặc Excel.
+
+Những dữ liệu thô này thường gặp các vấn đề:
+
+Chưa được chuẩn hóa schema
+
+Có khả năng trùng lặp hóa đơn
+
+Không có kiểm tra chất lượng dữ liệu
+
+Khó sử dụng trực tiếp cho phân tích
+
+Do đó, cần xây dựng một pipeline ETL tự động để:
+
+Ingest dữ liệu thô
+
+Làm sạch và validate dữ liệu
+
+Lưu trữ dữ liệu có cấu trúc cho phân tích
 
 ## 3. Dataset
 
-- **Dataset name:** Supermarket Sales
-- **File:** `Supermarket_sales.csv`
-- **Granularity:** Transaction-level (invoice-level)
+Tên dataset: Supermarket Sales
+File gốc excel download chuyển thành csv
 
-Key fields:
-- Invoice ID
-- Date
-- Branch / City
-- Product line
-- Quantity
-- Unit price
-- Total
+File dữ liệu: Supermarket_sales.csv
 
----
+Mức độ chi tiết: Transaction-level (theo hóa đơn)
 
-## 4. Pipeline Architecture
+Các trường chính:
+
+Invoice ID
+
+Date
+
+Branch / City
+
+Product line
+
+Quantity
+
+Unit price
+
+Total
+
+## 4. Kiến trúc Pipeline
 Supermarket_sales.csv
-↓
+        ↓
 raw_supermarket_sales
-↓
+        ↓
 clean_supermarket_sales
-↓
+        ↓
 fact_sales
 
-### Layers:
-- **Raw layer:** Stores ingested data without modification
-- **Clean layer:** Applies validation and data quality rules
-- **Serve layer (Fact table):** Ready for analytical queries
+Các layer:
 
----
+Raw layer: Lưu dữ liệu đúng như nguồn CSV, không chỉnh sửa
 
-## 5. Data Cleaning & Validation Rules
+Clean layer: Áp dụng các rule làm sạch và kiểm tra chất lượng
 
-The following rules are applied in the clean layer:
+Serve layer (Fact table): Sẵn sàng cho truy vấn và phân tích
 
-| Rule | Purpose |
-|----|--------|
-| Quantity > 0 | Logical data validation |
-| Unit price > 0 | Logical data validation |
-| Total = Quantity × Unit price | Data consistency |
-| Remove duplicate Invoice IDs | Prevent double counting |
-| Parse Date column | Enable time-based analysis |
+Pipeline được thiết kế theo kiến trúc Raw → Clean → Serve, giúp đảm bảo tính rõ ràng, dễ kiểm soát và mở rộng.
 
----
+## 5. Quy tắc làm sạch & kiểm tra dữ liệu
 
-## 6. Technology Stack
+Các quy tắc sau được áp dụng tại clean layer:
 
-- **Apache Airflow** – Workflow orchestration
-- **PostgreSQL** – Data storage
-- **Docker & Docker Compose** – Containerized deployment
-- **Python** – ETL logic
-- **Pandas & SQLAlchemy** – Data processing and DB interaction
+Quy tắc	Mục đích
+Quantity > 0	Kiểm tra logic dữ liệu
+Unit price > 0	Kiểm tra logic dữ liệu
+Total = Quantity × Unit price	Đảm bảo tính nhất quán
+Loại bỏ Invoice ID trùng lặp	Tránh double counting
+Parse cột Date	Phục vụ phân tích theo thời gian
 
----
+## 6. Logging & Data Quality Monitoring
 
-## 7. Project Structure
+Pipeline có cơ chế logging và kiểm tra chất lượng dữ liệu như sau:
 
+Logging
+
+Mỗi task trong pipeline (Extract, Clean, Load, Data Quality Check) đều ghi log
+
+Log được lưu trực tiếp trong Airflow Task Logs
+
+Thông tin log bao gồm:
+
+Số lượng bản ghi xử lý
+
+Trạng thái thực thi
+
+Kết quả kiểm tra data
+
+Data Quality Check
+
+Một task riêng biệt dùng để so sánh số lượng bản ghi giữa:
+
+Raw layer
+
+Clean layer
+
+Pipeline sẽ fail tự động nếu số lượng bản ghi bị giảm vượt ngưỡng cho phép
+
+Cách tiếp cận này giúp phát hiện sớm các vấn đề mất dữ liệu và đảm bảo độ tin cậy của dữ liệu đầu ra.
+
+## 7. Công nghệ sử dụng
+
+Apache Airflow – Orchestration và monitoring pipeline
+
+PostgreSQL – Lưu trữ dữ liệu
+
+Docker & Docker Compose – Triển khai hệ thống dạng container
+
+Dockerfile – Custom môi trường Airflow và dependency
+
+Python – Xử lý ETL
+
+Pandas – Xử lý dữ liệu
+
+SQLAlchemy – Kết nối và thao tác với database
+
+8. Cấu trúc project
 sales_etl_project/
 ├── dags/
-│ └── sales_etl_dag.py
+│   └── sales_etl_dag.py        # Airflow DAG
 ├── scripts/
-│ ├── extract.py
-│ ├── clean.py
-│ ├── load.py
-│ └── db.py
+│   ├── extract.py              # Load CSV vào raw layer
+│   ├── clean.py                # Clean & validate dữ liệu
+│   ├── load.py                 # Load dữ liệu vào fact table
+│   ├── quality_check.py        # Data quality check
+│   └── db.py                   # Kết nối PostgreSQL
 ├── data/
-│ └── Supermarket_sales.csv
-├── docker-compose.yml
-├── requirements.txt
+│   └── Supermarket_sales.csv
+├── Dockerfile                  # Custom Airflow image
+├── docker-compose.yml          # Airflow + PostgreSQL
+├── requirements.txt            # Python dependencies
 └── README.md
 
----
+## 9. Airflow DAG
 
-## 8. Airflow DAG
+Tên DAG: sales_etl_pipeline
 
-- **DAG name:** `sales_etl_pipeline`
-- **Schedule:** Manual trigger
-- **Tasks:**
-  1. Extract raw data from CSV
-  2. Clean and validate data
-  3. Load data into fact table
+Schedule: Trigger thủ công
 
-The DAG is triggered via the **Airflow Web UI**.
+Các task chính:
 
----
+Extract dữ liệu từ CSV vào raw layer
 
-## 9. How to Run the Project
+Clean & validate dữ liệu
 
-### 1️⃣ Start services using Docker
-```bash```
+Data quality check
+
+Load dữ liệu vào fact table
+
+Pipeline được trigger và theo dõi thông qua Airflow Web UI.
+
+## 10. Hướng dẫn chạy dự án
+1️⃣ Khởi động hệ thống bằng Docker
 docker compose up -d
-2️⃣ Open Airflow UI
+
+2️⃣ Mở Airflow Web UI
 
 URL: http://localhost:8080
 
 Username: admin
-
 Password: admin
 
-3️⃣ Trigger the DAG
+3️⃣ Trigger DAG
 
-Enable the DAG
+Enable DAG - Click Trigger DAG
 
-Click Trigger DAG
-
-Monitor task execution in Graph view
-----
-
-## 10. Example Queries
-
-Row count validation
+Theo dõi trạng thái trong Graph View
+## 11. Ví dụ truy vấn dữ liệu
+Kiểm tra số lượng bản ghi
 SELECT COUNT(*) FROM fact_sales;
 
-Revenue by branch
+Doanh thu theo chi nhánh
 SELECT branch, SUM(total) AS revenue
 FROM fact_sales
 GROUP BY branch;
 
-Monthly revenue
+Doanh thu theo tháng
 SELECT DATE_TRUNC('month', "Date") AS month, SUM(total)
 FROM fact_sales
 GROUP BY month
 ORDER BY month;
 
-## 11. Conclusion
+## 12. Kết luận
 
-This project demonstrates how to build a reproducible and automated ETL pipeline using modern Data Engineering tools.
+Dự án này minh họa cách xây dựng một ETL pipeline tự động, kiểm soát chất lượng và logging, có sử dụng các công cụ Data Engineering hiện đại.
 
-The pipeline ensures:
+Pipeline đảm bảo:
 
-Data quality and consistency
+Chất lượng và tính nhất quán của dữ liệu
 
-Clear separation of pipeline layers
+Phân tách rõ ràng các layer xử lý
 
-Easy orchestration and monitoring with Airflow
+Dễ dàng orchestration và monitoring bằng Airflow
 
-The resulting dataset is ready for analytical and business intelligence use cases.
+Khả năng tái tạo hệ thống với Docker
+
+Dữ liệu đầu ra sẵn sàng cho các bài toán phân tích và báo cáo doanh nghiệp.
+
+Có thể cải tiến nâng cao
