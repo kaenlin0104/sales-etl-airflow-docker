@@ -20,7 +20,7 @@ Khả năng tái tạo hệ thống bằng Docker
 
 Trong thực tế, dữ liệu giao dịch bán hàng của doanh nghiệp bán lẻ thường được export thủ công từ hệ thống POS dưới dạng file CSV hoặc Excel.
 
-Những dữ liệu thô này thường gặp các vấn đề:
+***Những dữ liệu thô này thường gặp các vấn đề:***
 
 Chưa được chuẩn hóa schema
 
@@ -30,7 +30,7 @@ Không có kiểm tra chất lượng dữ liệu
 
 Khó sử dụng trực tiếp cho phân tích
 
-Do đó, cần xây dựng một pipeline ETL tự động để:
+***Do đó, cần xây dựng một pipeline ETL tự động để:***
 
 Ingest dữ liệu thô
 
@@ -49,21 +49,22 @@ Mức độ chi tiết: Transaction-level (theo hóa đơn)
 
 Các trường chính:
 
-Invoice ID
+- Invoice ID
 
-Date
+- Date
 
-Branch / City
+- Branch / City
 
-Product line
+- Product line
 
-Quantity
+- Quantity
 
-Unit price
+- Unit price
 
-Total
+- Total
 
 ## 4. Kiến trúc Pipeline
+
 Supermarket_sales.csv
         ↓
 raw_supermarket_sales
@@ -74,13 +75,13 @@ fact_sales
 
 Các layer:
 
-Raw layer: Lưu dữ liệu đúng như nguồn CSV, không chỉnh sửa
+- Raw layer: Lưu dữ liệu đúng như nguồn CSV, không chỉnh sửa
 
-Clean layer: Áp dụng các rule làm sạch và kiểm tra chất lượng
+- Clean layer: Áp dụng các rule làm sạch và kiểm tra chất lượng
 
-Serve layer (Fact table): Sẵn sàng cho truy vấn và phân tích
+- Serve layer (Fact table): Sẵn sàng cho truy vấn và phân tích
 
-Pipeline được thiết kế theo kiến trúc Raw → Clean → Serve, giúp đảm bảo tính rõ ràng, dễ kiểm soát và mở rộng.
+- Pipeline được thiết kế theo kiến trúc Raw → Clean → Serve, giúp đảm bảo tính rõ ràng, dễ kiểm soát và mở rộng.
 
 ## 5. Quy tắc làm sạch & kiểm tra dữ liệu
 
@@ -125,19 +126,19 @@ Cách tiếp cận này giúp phát hiện sớm các vấn đề mất dữ li�
 
 ## 7. Công nghệ sử dụng
 
-Apache Airflow – Orchestration và monitoring pipeline
+-**Apache Airflow – Orchestration và monitoring pipeline**
 
-PostgreSQL – Lưu trữ dữ liệu
+-**PostgreSQL – Lưu trữ dữ liệu**
 
-Docker & Docker Compose – Triển khai hệ thống dạng container
+**Docker & Docker Compose – Triển khai hệ thống dạng container**
 
-Dockerfile – Custom môi trường Airflow và dependency
+-**Dockerfile – Custom môi trường Airflow và dependency**
 
-Python – Xử lý ETL
+-**Python – Xử lý ETL**
 
-Pandas – Xử lý dữ liệu
+-**Pandas – Xử lý dữ liệu**
 
-SQLAlchemy – Kết nối và thao tác với database
+-**SQLAlchemy – Kết nối và thao tác với database**
 
 8. Cấu trúc project
 
@@ -177,7 +178,7 @@ Pipeline được trigger và theo dõi thông qua Airflow Web UI.
 
 ## 10. Hướng dẫn chạy dự án
 1️⃣ Khởi động hệ thống bằng Docker
-```bash
+```bash```
 docker compose up -d
 
 2️⃣ Mở Airflow Web UI
@@ -192,16 +193,20 @@ Password: admin
 Enable DAG - Click Trigger DAG
 
 Theo dõi trạng thái trong Graph View
+
 ## 11. Ví dụ truy vấn dữ liệu
 Kiểm tra số lượng bản ghi
+
 SELECT COUNT(*) FROM fact_sales;
 
 Doanh thu theo chi nhánh
+
 SELECT branch, SUM(total) AS revenue
 FROM fact_sales
 GROUP BY branch;
 
 Doanh thu theo tháng
+
 SELECT DATE_TRUNC('month', "Date") AS month, SUM(total)
 FROM fact_sales
 GROUP BY month
