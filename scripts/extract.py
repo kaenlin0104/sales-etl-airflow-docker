@@ -1,7 +1,7 @@
 import pandas as pd
 from db import get_engine
 
-RAW_TABLE = "raw_supermarkepython scripts/load.pyt_sales"
+RAW_TABLE = "raw_supermarket_sales"
 CSV_PATH = "/opt/airflow/data/Supermarket_sales.csv"
 
 def load_raw_data():

@@ -201,13 +201,13 @@ SELECT COUNT(*) FROM fact_sales;
 
 Doanh thu theo chi nhánh
 
-SELECT branch, SUM(total) AS revenue
+SELECT "Branch", SUM("Total") AS revenue
 FROM fact_sales
-GROUP BY branch;
+GROUP BY "Branch";
 
 Doanh thu theo tháng
 
-SELECT DATE_TRUNC('month', "Date") AS month, SUM(total)
+SELECT DATE_TRUNC('month', "Date") AS month, SUM("Total")
 FROM fact_sales
 GROUP BY month
 ORDER BY month;
